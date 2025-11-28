@@ -33,6 +33,14 @@ jobs:
           tenant-id: ea9ca8b6-aa2d-4c4a-904a-cb93fd58a0b9
           subscription-id: 86cd11f5-4d26-4e93-bfa9-c0b7b2f44cc9
 
+      # 🔍 DEBUG STEP – FILE & PATH CHECK
+      - name: DEBUG – List files
+        run: |
+          pwd
+          ls
+          ls environments
+          ls environments/dev
+
       - name: Terraform Format Check
         run: terraform fmt -check
         continue-on-error: true

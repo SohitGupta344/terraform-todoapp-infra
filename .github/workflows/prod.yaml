@@ -2,11 +2,9 @@ name: Dev Terraform Workflow
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -14,7 +12,6 @@ permissions:
   contents: read
 
 jobs:
-
   terraform-init-plan:
     name: Terraform Init & Plan (DEV)
     runs-on: self-hosted
@@ -39,19 +36,19 @@ jobs:
       - name: Terraform Format Check
         run: terraform fmt -check
         continue-on-error: true
-        working-directory: environments/dev
+        working-directory: terraform-todoapp-infra/environments/dev
 
       - name: Terraform Init
         run: terraform init -input=false -var-file="./terraform.tfvars"
-        working-directory: environments/dev
+        working-directory: terraform-todoapp-infra/environments/dev
 
       - name: Terraform Validate
         run: terraform validate
-        working-directory: environments/dev
+        working-directory: terraform-todoapp-infra/environments/dev
 
       - name: Terraform Plan
         run: terraform plan -input=false -var-file="./terraform.tfvars"
-        working-directory: environments/dev
+        working-directory: terraform-todoapp-infra/environments/dev
 
 
   terraform-apply:
@@ -80,8 +77,8 @@ jobs:
 
       - name: Terraform Init
         run: terraform init -input=false -var-file="./terraform.tfvars"
-        working-directory: environments/dev
+        working-directory: terraform-todoapp-infra/environments/dev
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -var-file="./terraform.tfvars"
-        working-directory: environments/dev
+        working-directory: terraform-todoapp-infra/environments/dev

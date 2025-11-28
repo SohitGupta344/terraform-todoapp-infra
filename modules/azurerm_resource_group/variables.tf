@@ -1,3 +1,8 @@
-variable "rg_name" {}
-variable "rg_location" {}
-variable "rg_tags" {}
+variable "rgs" {
+  description = "A map of resource groups to create"
+  type = map(object({
+    name     = string
+    location = string
+    tags     = map(string)
+  }))
+}

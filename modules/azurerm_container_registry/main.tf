@@ -1,8 +1,9 @@
 resource "azurerm_container_registry" "acr" {
-  name                = var.acr_name
-  resource_group_name = var.rg_name
-  location            = var.location
+  for_each = var.acr 
+  name                = each.value.name
+  resource_group_name = each.value.resource_group_name
+  location            = each.value.location
   sku                 = "Premium"
   admin_enabled       = false
-  tags                = var.tags
+  tags                = each.value.tags
 }

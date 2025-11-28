@@ -1,4 +1,10 @@
-variable "sql_db_name" {}
-variable "server_id" {}
-variable "max_size_gb" {}
-variable "tags" {}
+variable "sql_databases" {
+  description = "A map of SQL databases to create"
+  type = map(object({
+    sql_db_name     = string
+    max_size_gb     = number
+    sql_server_name = string
+    rg_name         = string
+    tags            = map(string)
+  }))
+}

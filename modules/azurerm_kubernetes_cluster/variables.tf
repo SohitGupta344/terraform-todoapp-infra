@@ -1,11 +1,16 @@
-variable "aks_name" {}
-variable "location" {}
-variable "rg_name" {}
-variable "dns_prefix" {}
-variable "node_count" {
-  default = 1
+variable "aks" {
+  type = map(object({
+    name        = string
+    location    = string
+    rg_name     = string
+    dns_prefix = string
+
+    default_node_pool = object({
+      name       = string
+      node_count = number
+      vm_size    = string
+    })
+
+    tags = map(string)
+  }))
 }
-variable "vm_size" {
-  default = "Standard_B2s"
-}
-variable "tags" {}

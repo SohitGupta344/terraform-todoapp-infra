@@ -1,6 +1,11 @@
-variable "sql_server_name" {}
-variable "rg_name" {}
-variable "location" {}
-variable "admin_username" {}
-variable "admin_password" {}
-variable "tags" {}
+variable "sql_servers" {
+  description = "A map of SQL servers to create"
+  type = map(object({
+    sql_server_name   = string
+    rg_name          = string
+    location         = string
+    admin_username   = string
+    admin_password   = string
+    tags             = map(string)
+  }))
+}

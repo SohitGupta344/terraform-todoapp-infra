@@ -42,7 +42,7 @@ jobs:
         working-directory: environments/dev
 
       - name: Terraform Init
-        run: terraform init -input=false -var-file="terraform.tfvars"
+        run: terraform init -input=false -var-file="./terraform.tfvars"
         working-directory: environments/dev
 
       - name: Terraform Validate
@@ -50,7 +50,7 @@ jobs:
         working-directory: environments/dev
 
       - name: Terraform Plan
-        run: terraform plan -input=false -var-file="terraform.tfvars"
+        run: terraform plan -input=false -var-file="./terraform.tfvars"
         working-directory: environments/dev
 
 
@@ -79,9 +79,9 @@ jobs:
           subscription-id: 86cd11f5-4d26-4e93-bfa9-c0b7b2f44cc9
 
       - name: Terraform Init
-        run: terraform init -input=false -var-file="terraform.tfvars"
+        run: terraform init -input=false -var-file="./terraform.tfvars"
         working-directory: environments/dev
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var-file="terraform.tfvars"
+        run: terraform apply -auto-approve -var-file="./terraform.tfvars"
         working-directory: environments/dev

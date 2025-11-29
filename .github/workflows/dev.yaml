@@ -6,72 +6,83 @@ on:
       - main
   push:
     branches:
-      - main      
+      - main
 
 permissions:
   id-token: write
   contents: read
-  
-jobs: 
-  terraform-init-plan:
+
+jobs:
+# =========================
+# Terraform Init + Plan
+# =========================
+  terraform-plan:
+    name: Terraform Init & Plan (DEV)
     runs-on: self-hosted
-    steps: 
-      - name: Checkout
-        uses: actions/checkout@v5.0.0
-    
-      - name: Azure Login
-        uses: Azure/login@v2.3.0
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Azure Login (OIDC)
+        uses: Azure/login@v2
         with:
           client-id: 3d4cb9b2-31d4-4781-8fc7-36392e41968a
           tenant-id: ea9ca8b6-aa2d-4c4a-904a-cb93fd58a0b9
           subscription-id: 86cd11f5-4d26-4e93-bfa9-c0b7b2f44cc9
-            
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
       - name: Terraform fmt
-        id: fmt
         run: terraform fmt -check
         continue-on-error: true
         working-directory: environments/dev
-        
+
       - name: Terraform Init
-        id: init
-        run: terraform init -input=false  
+        run: terraform init -input=false
         working-directory: environments/dev
 
       - name: Terraform Validate
-        id: validate
         run: terraform validate -no-color
-        working-directory: environments/dev        
-      
+        working-directory: environments/dev
+
       - name: Terraform Plan
-        id: plan
         run: terraform plan -no-color -input=false
-        continue-on-error: true
-        working-directory: environments/dev    
-        
-  terraform-apply:    
+        working-directory: environments/dev
+
+# =========================
+# Terraform Apply (DEV)
+# =========================
+  terraform-apply:
+    name: Terraform Apply (DEV)
     runs-on: self-hosted
-    if: github.ref == 'refs/heads/main'
-    needs: terraform-init-plan
+    needs: terraform-plan
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment: dev
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5.0.0
-    
-      - name: Azure Login
-        uses: Azure/login@v2.3.0
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Azure Login (OIDC)
+        uses: Azure/login@v2
         with:
           client-id: 3d4cb9b2-31d4-4781-8fc7-36392e41968a
           tenant-id: ea9ca8b6-aa2d-4c4a-904a-cb93fd58a0b9
-          subscription-id: 86cd11f5-4d26-4e93-bfa9-c0b7b2f44cc9   
-          
+          subscription-id: 86cd11f5-4d26-4e93-bfa9-c0b7b2f44cc9
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
       - name: Terraform Init
-        id: init
-        run: terraform init -input=false  
+        run: terraform init -input=false
         working-directory: environments/dev
 
       - name: Terraform Apply
-        id: apply
-        run: terraform apply --auto-approve
-        continue-on-error: true
-        working-directory: environments/dev              
-          
+        run: terraform apply -input=false --auto-approve
+        working-directory: environments/dev

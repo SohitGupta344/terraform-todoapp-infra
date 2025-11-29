@@ -1,7 +1,7 @@
 rgs = {
   "rg1" = {
-    name     = "dev-rg1"
-    location = "East US"
+    name     = "rg-todo-sohit-01"
+    location = "Central US"
     tags     = {
       environment = "dev"
       project     = "project1"
@@ -12,9 +12,9 @@ rgs = {
 
 acr = {
   "acr1" = {
-    name                = "devacr1"
-    resource_group_name = "dev-rg1"
-    location            = "East US"
+    name                = "sohitacrdev01"
+    resource_group_name = "rg-todo-sohit-01"
+    location            = "Central US"
     tags = {
       environment = "dev"
       project     = "project1"
@@ -24,15 +24,15 @@ acr = {
 
 aks = {
   "aks1" = {
-    name       = "dev-aks1"
-    location   = "East US"
-    rg_name    = "dev-rg1"
+    name       = "sohit-aksdev01"
+    location   = "Central US"
+    rg_name    = "rg-todo-sohit-01"
     dns_prefix = "devaks1"
 
     default_node_pool = {
       name       = "default"
       node_count = 1
-      vm_size    = "Standard_B1s"
+      vm_size    = "Standard_D4s_v3"
     }
 
     tags = {
@@ -44,9 +44,9 @@ aks = {
 
 sql_servers = {
   "sqlserver1" = {
-    sql_server_name = "devsqlserver1"
-    rg_name         = "dev-rg1"
-    location        = "East US"
+    sql_server_name = "sohit-devsqlserver1"
+    rg_name         = "rg-todo-sohit-01"
+    location        = "Central US"
     admin_username  = "sqladminuser"
     admin_password  = "P@ssw0rd1234!"
     tags = {
@@ -58,10 +58,10 @@ sql_servers = {
 
 sql_databases = {
   "sqldb1" = {
-    sql_db_name     = "devsqldb1"
+    sql_db_name     = "sohit-devsqldb1"
     max_size_gb     = 10
-    sql_server_name = "devsqlserver1"
-    rg_name         = "dev-rg1"
+    sql_server_name = "sohit-devsqlserver1"
+    rg_name         = "rg-todo-sohit-01"
     tags = {
       environment = "dev"
       project     = "project1"

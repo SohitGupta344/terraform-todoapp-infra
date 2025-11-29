@@ -26,5 +26,5 @@ module "sql_databases" {
   source        = "../../modules/azurerm_sql_database"
   sql_databases = var.sql_databases
 
-  depends_on = [module.sql_servers]
+  depends_on = [module.sql_servers, module.rg]
 }

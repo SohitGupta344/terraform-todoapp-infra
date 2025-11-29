@@ -1,92 +1,77 @@
-name: Prod Terraform Workflow
+name: "Prod Terraform Workflow"
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
-  workflow_dispatch:
+    branches:
+      - main
+  push:
+    branches:
+      - main      
 
 permissions:
   id-token: write
   contents: read
-
-jobs:
+  
+jobs: 
   terraform-init-plan:
-    name: Terraform Init & Plan (DEV)
     runs-on: self-hosted
-
-    env:
-      ARM_CLIENT_ID: 3d4cb9b2-31d4-4781-8fc7-36392e41968a
-      ARM_TENANT_ID: ea9ca8b6-aa2d-4c4a-904a-cb93fd58a0b9
-      ARM_SUBSCRIPTION_ID: 86cd11f5-4d26-4e93-bfa9-c0b7b2f44cc9
-      ARM_USE_OIDC: true
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Azure Login (OIDC)
-        uses: Azure/login@v2
+    steps: 
+      - name: Checkout
+        uses: actions/checkout@v5.0.0
+    
+      - name: Azure Login
+        uses: Azure/login@v2.3.0
         with:
           client-id: 3d4cb9b2-31d4-4781-8fc7-36392e41968a
           tenant-id: ea9ca8b6-aa2d-4c4a-904a-cb93fd58a0b9
           subscription-id: 86cd11f5-4d26-4e93-bfa9-c0b7b2f44cc9
-
-      # 🔍 DEBUG STEP – FILE & PATH CHECK
-      - name: DEBUG – List files
-        run: |
-          pwd
-          ls
-          ls environments
-          ls environments/dev
-
-      - name: Terraform Format Check
+            
+      - name: Terraform fmt
+        id: fmt
         run: terraform fmt -check
         continue-on-error: true
-        working-directory: environments/dev
-
+        working-directory: terraform-todoapp-infra/terraform-todoapp-infra/environments/prod
+        
       - name: Terraform Init
-        run: terraform init -input=false -var-file="./terraform.tfvars"
-        working-directory: environments/dev
+        id: init
+        run: terraform init -input=false  
+        working-directory: terraform-todoapp-infra/terraform-todoapp-infra/environments/prod
 
       - name: Terraform Validate
-        run: terraform validate
-        working-directory: environments/dev
-
+        id: validate
+        run: terraform validate -no-color
+        working-directory: terraform-todoapp-infra/terraform-todoapp-infra/environments/prod        
+      
       - name: Terraform Plan
-        run: terraform plan -input=false -var-file="./terraform.tfvars"
-        working-directory: environments/dev
-
-
-  terraform-apply:
-    name: Terraform Apply (DEV)
+        id: plan
+        run: terraform plan -no-color -input=false
+        continue-on-error: true
+        working-directory: terraform-todoapp-infra/terraform-todoapp-infra/environments/prod    
+        
+  terraform-apply:    
     runs-on: self-hosted
-    needs: terraform-init-plan
     if: github.ref == 'refs/heads/main'
-    environment: dev
-
-    env:
-      ARM_CLIENT_ID: 3d4cb9b2-31d4-4781-8fc7-36392e41968a
-      ARM_TENANT_ID: ea9ca8b6-aa2d-4c4a-904a-cb93fd58a0b9
-      ARM_SUBSCRIPTION_ID: 86cd11f5-4d26-4e93-bfa9-c0b7b2f44cc9
-      ARM_USE_OIDC: true
-
+    needs: terraform-init-plan
+    environment: prod
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Azure Login (OIDC)
-        uses: Azure/login@v2
+      - name: Checkout
+        uses: actions/checkout@v5.0.0
+    
+      - name: Azure Login
+        uses: Azure/login@v2.3.0
         with:
           client-id: 3d4cb9b2-31d4-4781-8fc7-36392e41968a
           tenant-id: ea9ca8b6-aa2d-4c4a-904a-cb93fd58a0b9
-          subscription-id: 86cd11f5-4d26-4e93-bfa9-c0b7b2f44cc9
-
+          subscription-id: 86cd11f5-4d26-4e93-bfa9-c0b7b2f44cc9   
+          
       - name: Terraform Init
-        run: terraform init -input=false -var-file="./terraform.tfvars"
-        working-directory: environments/dev
+        id: init
+        run: terraform init -input=false  
+        working-directory: terraform-todoapp-infra/terraform-todoapp-infra/environments/prod
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var-file="./terraform.tfvars"
-        working-directory: environments/dev
+        id: apply
+        run: terraform apply -input=false --auto-approve
+        continue-on-error: true
+        working-directory: terraform-todoapp-infra/terraform-todoapp-infra/environments/prod              
+          

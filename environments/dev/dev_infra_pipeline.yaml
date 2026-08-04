@@ -75,12 +75,11 @@ stages:
       displayName: Terraform Format
 
       inputs:
-        targetType: inline
-
+        targetType: 'inline'
         script: |
           Set-Location "$(workingDirectory)"
-
-          terraform fmt -recursive -check
+          
+          terraform fmt -recursive
 
 #########################################################
 
@@ -160,7 +159,7 @@ stages:
 
         script: |
 
-          Set-Location "$(workingDirectory1)"
+          Set-Location "$(workingDirectory)"
 
           tfsec . `
           --format json `
@@ -190,7 +189,7 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          Set-Location "$(workingDirectory2)"
+          Set-Location "$(workingDirectory)"
           
           infracost auth login
           

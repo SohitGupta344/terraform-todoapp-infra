@@ -1,22 +1,26 @@
 terraform {
+
+  required_version = ">= 1.10.0"
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.41.0"
+      version = "~>4.38"
     }
   }
+  
   backend "azurerm" {
-    resource_group_name  = "sohit-docker-vm-dont-delete"
-    storage_account_name = "sohitstg1"
-    container_name       = "sohittfstate"
+    resource_group_name  = "sohit-rg"
+    storage_account_name = "sohittfstate001"
+    container_name       = "tfstate"
     key                  = "dev.tfstate"
-    tenant_id            = "ea9ca8b6-aa2d-4c4a-904a-cb93fd58a0b9"
-    subscription_id      = "86cd11f5-4d26-4e93-bfa9-c0b7b2f44cc9"
+    tenant_id            = "a7dd8b02-fc7e-452c-9b2c-c53db150afd2"
+    subscription_id      = "ff8dbcde-c654-4f43-be29-1fa4ab0bad46"
 
   }
 }
 
 provider "azurerm" {
   features {}
-  subscription_id = "86cd11f5-4d26-4e93-bfa9-c0b7b2f44cc9"
+  subscription_id = "ff8dbcde-c654-4f43-be29-1fa4ab0bad46"
 }

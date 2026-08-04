@@ -1,70 +1,51 @@
-locals {
-  common_tags = {
-    "ManagedBy"   = "Terraform"
-    "Owner"       = "TodoAppTeam"
-    "Environment" = "prod"
-  }
-}
-
 module "rg" {
-  source      = "../../modules/azurerm_resource_group"
-  rg_name     = "rg-prod-todoapp"
-  rg_location = "centralindia"
-  rg_tags     = local.common_tags
-}
-
-module "rg1" {
-  source      = "../../modules/azurerm_resource_group"
-  rg_name     = "rg-prod-todoapp-1"
-  rg_location = "centralindia"
-  rg_tags     = local.common_tags
+  source              = "../../modules/resource_group"
+  resource_group_name = var.resource_group_name
+  location            = var.location
 }
 
 module "acr" {
-  depends_on = [module.rg]
-  source     = "../../modules/azurerm_container_registry"
-  acr_name   = "acrprodtodoapp"
-  rg_name    = "rg-prod-todoapp"
-  location   = "centralindia"
-  tags       = local.common_tags
-}
-
-module "sql_server" {
-  depends_on      = [module.rg]
-  source          = "../../modules/azurerm_sql_server"
-  sql_server_name = "sql-prod-todoapp"
-  rg_name         = "rg-prod-todoapp"
-  location        = "centralindia"
-  admin_username  = "prodopsadmin"
-  admin_password  = "P@ssw01rd@123"
-  tags            = local.common_tags
-}
-
-module "sql_db" {
-  depends_on  = [module.sql_server]
-  source      = "../../modules/azurerm_sql_database"
-  sql_db_name = "sqldb-prod-todoapp"
-  server_id   = module.sql_server.server_id
-  max_size_gb = "2"
-  tags        = local.common_tags
+  source              = "../../modules/container_registry"
+  acr_name            = var.acr_name
+  resource_group_name = module.rg.resource_group_name
+  location            = var.location
+  depends_on          = [module.rg]
 }
 
 module "aks" {
+  source              = "../../modules/kubernetes_cluster"
+  aks_name            = var.aks_name
+  resource_group_name = module.rg.resource_group_name
+  location            = var.location
+  dns_prefix          = var.dns_prefix
+
+  default_node_pool = {
+    name       = var.default_node_pool_name
+    node_count = var.default_node_pool_node_count
+    vm_size    = var.default_node_pool_vm_size
+  }
+
+  depends_on = [module.acr, module.rg]
+}
+
+module "sql_servers" {
+  source              = "../../modules/sql_server"
+  sql_server_name     = var.sql_server_name
+  resource_group_name = module.rg.resource_group_name
+  location            = var.location
+  admin_username      = var.admin_username
+  admin_password      = var.admin_password
+
   depends_on = [module.rg]
-  source     = "../../modules/azurerm_kubernetes_cluster"
-  aks_name   = "aks-prod-todoapp"
-  location   = "centralindia"
-  rg_name    = "rg-prod-todoapp"
-  dns_prefix = "aks-prod-todoapp"
-  tags       = local.common_tags
 }
 
+module "sql_databases" {
+  source              = "../../modules/sql_database"
+  sql_database_name   = var.sql_database_name
+  resource_group_name = module.rg.resource_group_name
+  location            = var.location
+  sql_server_name     = module.sql_servers.sql_server_name
 
-module "pip" {
-  source   = "../../modules/azurerm_public_ip"
-  pip_name = "pip-prod-todoapp"
-  rg_name  = "rg-prod-todoapp"
-  location = "centralindia"
-  sku      = "Basic"
-  tags     = local.common_tags
+  depends_on = [module.sql_servers, module.rg]
 }
+

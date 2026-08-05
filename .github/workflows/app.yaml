@@ -5,6 +5,8 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - 'app_infra/**'
   push:
     branches:
       - main

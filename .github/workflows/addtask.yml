@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'AddTaskTodoMicroservice-main/**'
 
 permissions:
   id-token: write

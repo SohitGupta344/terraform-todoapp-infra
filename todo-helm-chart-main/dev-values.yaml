@@ -1,0 +1,50 @@
+common:
+  containerRegistryURL: sohitacrdev02.azurecr.io
+  ingressClass: azure-application-gateway
+  
+ui:
+  replicas: 2
+  image:
+    name: todo-ui
+    tag: v3
+  port: 80
+  ServicePort: 80
+  ingress:
+    host: ui.sohitguptadevops.online
+    ingressClass: azure-application-gateway
+
+getTask:
+  replicas: 2
+  image:
+    name: todo-get-tasks-api
+    tag: v2
+  port: 8000
+  ServicePort: 80
+  connectionString: Driver={ODBC Driver 18 for SQL Server};Server=tcp:sohit-devsqlserver2.database.windows.net,1433;Database=sohit-devsqldb2;Uid=sqladminuser;Pwd=P@ssw0rd1234!;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;
+  ingress:
+    host: get-tasks-api.sohitguptadevops.online
+    ingressClass: azure-application-gateway
+
+deleteTask:
+  replicas: 2
+  image:
+    name: todo-delete-tasks-api
+    tag: v2
+  port: 8000
+  ServicePort: 80
+  connectionString: Driver={ODBC Driver 18 for SQL Server};Server=tcp:sohit-devsqlserver2.database.windows.net,1433;Database=sohit-devsqldb2;Uid=sqladminuser;Pwd=P@ssw0rd1234!;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;
+  ingress:
+    host: delete-task-api.sohitguptadevops.online
+    ingressClass: azure-application-gateway
+
+addTask:
+  replicas: 2
+  image:
+    name: todo-add-tasks-api
+    tag: v2
+  port: 8000
+  ServicePort: 80
+  connectionString: Driver={ODBC Driver 18 for SQL Server};Server=tcp:sohit-devsqlserver2.database.windows.net,1433;Database=sohit-devsqldb2;Uid=sqladminuser;Pwd=P@ssw0rd1234!;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;
+  ingress:
+    host: add-task-api.sohitguptadevops.online
+    ingressClass: azure-application-gateway

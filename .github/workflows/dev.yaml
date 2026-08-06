@@ -31,7 +31,6 @@ jobs:
           Write-Host "Branch     : ${{ github.ref }}"
           Write-Host "Event      : ${{ github.event_name }}"
           Write-Host "Actor      : ${{ github.actor }}"
-          Write-Host "Runner OS  : $env:RUNNER_OS"
 
       - name: Verify Secrets
         shell: pwsh
@@ -50,7 +49,6 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          enable-AzPSSession: false
 
       - name: Verify Azure Login
         shell: pwsh
@@ -97,8 +95,6 @@ jobs:
 
     runs-on: self-hosted
 
-    environment: dev
-
     steps:
 
       - name: Checkout Repository
@@ -110,7 +106,11 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          enable-AzPSSession: false
+
+      - name: Verify Azure Login
+        shell: pwsh
+        run: |
+          az account show
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3

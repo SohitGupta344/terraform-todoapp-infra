@@ -5,10 +5,6 @@ on:
     branches:
       - main
 
-  pull_request:
-    branches:
-      - main
-
 permissions:
   id-token: write
   contents: read
@@ -19,55 +15,34 @@ env:
 
 jobs:
 
-#########################################################
-# Terraform PLAN
-#########################################################
-
   terraform-plan:
-
     name: Terraform Init & Plan (DEV)
-
     runs-on: self-hosted
 
     steps:
 
-      ###################################################
-      # Checkout
-      ###################################################
-
       - name: Checkout Repository
         uses: actions/checkout@v5
 
-      ###################################################
-      # Debug GitHub Context
-      ###################################################
-
       - name: GitHub Context
-        shell: bash
+        shell: pwsh
         run: |
-          echo "Repository : ${{ github.repository }}"
-          echo "Branch     : ${{ github.ref }}"
-          echo "Event      : ${{ github.event_name }}"
-          echo "Actor      : ${{ github.actor }}"
-
-      ###################################################
-      # Secret Length
-      ###################################################
+          Write-Host "Repository : ${{ github.repository }}"
+          Write-Host "Branch     : ${{ github.ref }}"
+          Write-Host "Event      : ${{ github.event_name }}"
+          Write-Host "Actor      : ${{ github.actor }}"
+          Write-Host "Runner OS  : $env:RUNNER_OS"
 
       - name: Verify Secrets
-        shell: bash
+        shell: pwsh
         env:
           CLIENT: ${{ secrets.AZURE_CLIENT_ID }}
           TENANT: ${{ secrets.AZURE_TENANT_ID }}
           SUB: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         run: |
-          echo "Client Length = ${#CLIENT}"
-          echo "Tenant Length = ${#TENANT}"
-          echo "Subscription Length = ${#SUB}"
-
-      ###################################################
-      # Azure Login
-      ###################################################
+          Write-Host "Client Length       : $($env:CLIENT.Length)"
+          Write-Host "Tenant Length       : $($env:TENANT.Length)"
+          Write-Host "Subscription Length : $($env:SUB.Length)"
 
       - name: Azure Login (OIDC)
         uses: azure/login@v2
@@ -77,19 +52,11 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: false
 
-      ###################################################
-      # Azure Validation
-      ###################################################
-
       - name: Verify Azure Login
-        shell: bash
+        shell: pwsh
         run: |
           az account show
-          az account list -o table
-
-      ###################################################
-      # Terraform
-      ###################################################
+          az account list --output table
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -97,53 +64,45 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
 
       - name: Terraform Version
+        shell: pwsh
         run: terraform version
 
       - name: Terraform Format
+        shell: pwsh
         working-directory: ${{ env.WORKING_DIRECTORY }}
         run: terraform fmt -check
         continue-on-error: true
 
       - name: Terraform Init
+        shell: pwsh
         working-directory: ${{ env.WORKING_DIRECTORY }}
         run: terraform init -input=false
 
       - name: Terraform Validate
+        shell: pwsh
         working-directory: ${{ env.WORKING_DIRECTORY }}
-        run: terraform validate
+        run: terraform validate -no-color
 
       - name: Terraform Plan
+        shell: pwsh
         working-directory: ${{ env.WORKING_DIRECTORY }}
-        run: terraform plan -input=false -out=tfplan
-
-#########################################################
-# Terraform APPLY
-#########################################################
+        run: terraform plan -input=false -no-color -out=tfplan
 
   terraform-apply:
-
     name: Terraform Apply (DEV)
 
     needs: terraform-plan
 
-    runs-on: self-hosted
-
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    runs-on: self-hosted
 
     environment: dev
 
     steps:
 
-      ###################################################
-      # Checkout
-      ###################################################
-
       - name: Checkout Repository
         uses: actions/checkout@v5
-
-      ###################################################
-      # Azure Login
-      ###################################################
 
       - name: Azure Login (OIDC)
         uses: azure/login@v2
@@ -153,19 +112,17 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: false
 
-      ###################################################
-      # Terraform
-      ###################################################
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
       - name: Terraform Init
+        shell: pwsh
         working-directory: ${{ env.WORKING_DIRECTORY }}
         run: terraform init -input=false
 
       - name: Terraform Apply
+        shell: pwsh
         working-directory: ${{ env.WORKING_DIRECTORY }}
         run: terraform apply -input=false -auto-approve

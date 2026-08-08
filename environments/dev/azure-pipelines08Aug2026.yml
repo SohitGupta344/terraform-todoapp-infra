@@ -255,7 +255,7 @@ stages:
 
         environmentServiceNameAzureRM: $(serviceConnection)
 
-        commandOptions: "-out=tfplan"
+        commandOptions: "-out=tfplan -input=false"
 
     - task: PowerShell@2
 

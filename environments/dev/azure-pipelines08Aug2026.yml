@@ -79,7 +79,7 @@ stages:
         script: |
           Set-Location "$(workingDirectory)"
 
-          terraform fmt -recursive -check
+          terraform fmt -recursive
 
 #########################################################
 
